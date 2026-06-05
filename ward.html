@@ -87508,7 +87508,7 @@ const orbitRotate = new Vec3();
 const flyRotate = new Vec3();
 class TouchDevice {
     orbitSpeed = 18;
-    moveSpeed = 1.2;
+    moveSpeed = 4;
     pinchSpeed = 0.4;
     touchRotateSensitivity = 1.5;
     _source = new MultiTouchSource();
@@ -91535,10 +91535,7 @@ export { main };
                 function tick() {
                     const W = window.innerWidth, H = window.innerHeight;
                     cameraEntity.camera.worldToScreen(doorVec, screen);
-                    const p = cameraEntity.getPosition();
-                    const dx = p.x - DOOR.x, dy = p.y - DOOR.y, dz = p.z - DOOR.z;
-                    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
-                    if (dist < 6 && screen.z > 0 && screen.x > 0 && screen.x < W && screen.y > 0 && screen.y < H) {
+                    if (screen.z > 0 && screen.x > 0 && screen.x < W && screen.y > 0 && screen.y < H) {
                         dot.style.left = screen.x + 'px';
                         dot.style.top = screen.y + 'px';
                         dot.style.display = 'block';
