@@ -83193,6 +83193,7 @@ const initJoystick = (dom, events, state) => {
     events.on('inputMode:changed', updateJoystickVisibility);
     events.on('gamingControls:changed', updateJoystickVisibility);
     window.addEventListener('resize', updateJoystickVisibility);
+    updateJoystickVisibility();
     // Handle joystick touch input directly on the joystick element
     const updateJoystickStick = (clientX, clientY) => {
         const baseY = joystickFixedY();
@@ -91362,7 +91363,7 @@ const main = async (canvas, settingsJson, config) => {
         readyToRender: false,
         performanceMode: storedPerformanceMode !== null ? storedPerformanceMode === 'true' : platform.mobile,
         progress: 0,
-        inputMode: platform.mobile ? 'touch' : 'desktop',
+        inputMode: 'touch',
         cameraMode: 'orbit',
         hasAnimation: false,
         animationDuration: 0,
@@ -91502,11 +91503,12 @@ export { main };
                 document.head.appendChild(style);
 
                 const doorDot = document.createElement('div');
-                doorDot.style.cssText = 'position:fixed;width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.9);border:1px solid rgba(255,255,255,0.4);transform:translate(-50%,-50%);pointer-events:none;animation:pulse-white 2s ease-in-out infinite;display:none;z-index:1000;';
+                doorDot.style.cssText = 'position:fixed;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.9);border:1px solid rgba(255,255,255,0.4);transform:translate(-50%,-50%);pointer-events:auto;animation:pulse-white 2s ease-in-out infinite;display:none;z-index:1000;cursor:pointer;';
+                doorDot.addEventListener('click', () => { window.location.href = 'garden.html'; });
                 document.body.appendChild(doorDot);
 
                 const cameraEntity = viewer.global.camera;
-                const doorVec = new Vec3(-0.06, 0.23, 62.0);
+                const doorVec = new Vec3(0.695, -2.0, 59.959);
                 const screen = new Vec3();
 
                 function tickDoor() {
