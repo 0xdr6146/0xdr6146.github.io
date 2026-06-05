@@ -86146,6 +86146,10 @@ class CameraManager {
         resetCamera.angles.set(0.5, 179.5, 0.0);
         resetCamera.distance = 3.464;
         resetCamera.fov = 75.0;
+        resetCamera.position.set(-0.07, 0.26, -1.49);
+        resetCamera.angles.set(0.5, 179.5, 0.0);
+        resetCamera.distance = 3.464;
+        resetCamera.fov = 75.0;
         const getAnimTrack = (initial, isObjectExperience) => {
             const { animTracks } = settings;
             // extract the camera animation track from settings
@@ -91468,8 +91472,85 @@ export { main };
                 const canvas = document.getElementById('application-canvas');
                 const settingsJson = await settings;
                 const viewer = await main(canvas, settingsJson, config);
+
+                // ── door hotspot ───────────────────────────────────────────
+                const DOOR = { x: -0.13, y: -0.34, z: 9.44 };
+                const hasKey = () => sessionStorage.getItem('rusty_key') === 'true';
+
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes pulse {
+                        0%,100% { box-shadow:0 0 6px rgba(255,204,68,0.5); transform:translate(-50%,-50%) scale(1); }
+                        50%      { box-shadow:0 0 14px rgba(255,204,68,0.9); transform:translate(-50%,-50%) scale(1.3); }
+                    }
+                `;
+                document.head.appendChild(style);
+
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:1000;';
+                document.body.appendChild(overlay);
+
+                const dot = document.createElement('div');
+                dot.style.cssText = 'position:fixed;width:14px;height:14px;border-radius:50%;background:rgba(255,204,68,0.9);border:1px solid rgba(255,204,68,0.4);transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;animation:pulse 2s ease-in-out infinite;display:none;';
+                overlay.appendChild(dot);
+
+                const msg = document.createElement('div');
+                msg.style.cssText = 'position:fixed;bottom:70px;left:50%;transform:translateX(-50%);width:min(380px,90vw);background:rgba(0,0,0,0.85);color:#e8e8e8;font:15px/1.6 monospace;padding:18px 22px;border:1px solid rgba(255,255,255,0.15);border-radius:4px;display:none;pointer-events:auto;z-index:2000;';
+                document.body.appendChild(msg);
+
+                dot.addEventListener('click', () => {
+                    msg.innerHTML = '';
+                    msg.style.display = 'block';
+                    const txt = document.createElement('div');
+                    const hint = document.createElement('div');
+                    hint.style.cssText = 'color:#555;font-size:12px;margin-top:10px;text-align:right;';
+
+                    if (sessionStorage.getItem('rusty_key') === 'true') {
+                        txt.textContent = '> the rusty key fits. the lock groans and turns.';
+                        hint.textContent = 'tap to continue ›';
+                        msg.appendChild(txt);
+                        msg.appendChild(hint);
+                        setTimeout(() => {
+                            msg.onclick = () => {
+                                msg.style.display = 'none';
+                                window.location.href = 'anastassia.html';
+                            };
+                        }, 300);
+                    } else {
+                        txt.textContent = '> the door is locked. you need a key.';
+                        hint.textContent = 'tap to close ›';
+                        msg.appendChild(txt);
+                        msg.appendChild(hint);
+                        setTimeout(() => {
+                            msg.onclick = () => { msg.style.display = 'none'; };
+                        }, 300);
+                    }
+                });
+
+                // proximity — dot appears when close to door
+                const cameraEntity = viewer.global.camera;
+                const doorVec = new Vec3(DOOR.x, DOOR.y, DOOR.z);
+                const screen = new Vec3();
+
+                function tick() {
+                    const W = window.innerWidth, H = window.innerHeight;
+                    cameraEntity.camera.worldToScreen(doorVec, screen);
+                    const p = cameraEntity.getPosition();
+                    const dx = p.x - DOOR.x, dy = p.y - DOOR.y, dz = p.z - DOOR.z;
+                    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                    if (dist < 6 && screen.z > 0 && screen.x > 0 && screen.x < W && screen.y > 0 && screen.y < H) {
+                        dot.style.left = screen.x + 'px';
+                        dot.style.top = screen.y + 'px';
+                        dot.style.display = 'block';
+                        dot.style.pointerEvents = 'auto';
+                    } else {
+                        dot.style.display = 'none';
+                    }
+                    requestAnimationFrame(tick);
+                }
+                tick();
             });
         </script>
-        <a href="garden.html" style="position:fixed;bottom:20px;left:20px;font:33px monospace;color:#fff;text-decoration:none;z-index:9999;opacity:0.8;">←</a>
+        <a href="garden2.html" style="position:fixed;bottom:20px;left:20px;font:33px monospace;color:#fff;text-decoration:none;z-index:9999;opacity:0.8;">←</a>
     </body>
 </html>
