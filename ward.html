@@ -87627,9 +87627,8 @@ class TouchDevice {
         // (close-pinch = +pinch[0] = zoom out). First-person modes interpret
         // +z as "forward", so spreading (pinch[0] < 0) should move forward —
         // flip the sign there.
-        const pinchScale = (directFirstPerson && double) ? this.moveSpeed * dt : (double * this.pinchSpeed * DISPLACEMENT_SCALE);
         pinchMoveTmp.set(0, 0, (orbit - directFirstPerson) * pinch[0]);
-        v.add(pinchMoveTmp.mulScalar(pinchScale));
+        v.add(pinchMoveTmp.mulScalar(double * this.pinchSpeed * DISPLACEMENT_SCALE));
         // tap-to-jump in walk + gaming controls
         if (isWalk && this._tapJump) {
             v.y = 1;
@@ -91367,7 +91366,7 @@ const main = async (canvas, settingsJson, config) => {
         performanceMode: storedPerformanceMode !== null ? storedPerformanceMode === 'true' : platform.mobile,
         progress: 0,
         inputMode: platform.mobile ? 'touch' : 'desktop',
-        cameraMode: 'fly',
+        cameraMode: 'orbit',
         hasAnimation: false,
         animationDuration: 0,
         animationTime: 0,
@@ -91380,7 +91379,7 @@ const main = async (canvas, settingsJson, config) => {
         collisionOverlayEnabled: false,
         isFullscreen: false,
         controlsHidden: false,
-        gamingControls: false
+        gamingControls: true
     });
     const global = {
         app,
@@ -91473,13 +91472,6 @@ export { main };
                 const canvas = document.getElementById('application-canvas');
                 const settingsJson = await settings;
                 const viewer = await main(canvas, settingsJson, config);
-
-                // Touch speed for fly mode
-                if (viewer.inputController && viewer.inputController._touch) {
-                    viewer.inputController._touch.moveSpeed = 5.0;
-                    viewer.inputController._touch.orbitSpeed = 25;
-                    viewer.inputController._touch.touchRotateSensitivity = 1.0;
-                }
 
                 // ── door hotspot ───────────────────────────────────────────
                 const DOOR = { x: -0.13, y: -0.34, z: 9.44 };

@@ -86145,7 +86145,7 @@ class CameraManager {
         // Hardcoded start camera
         resetCamera.position.set(-0.06, 0.23, -0.07);
         resetCamera.angles.set(-0.5, 181.2, 0.0);
-        resetCamera.distance = 3.0;
+        resetCamera.distance = 0.067;
         resetCamera.fov = 75.0;
         const getAnimTrack = (initial, isObjectExperience) => {
             const { animTracks } = settings;
@@ -87624,10 +87624,8 @@ class TouchDevice {
         // (close-pinch = +pinch[0] = zoom out). First-person modes interpret
         // +z as "forward", so spreading (pinch[0] < 0) should move forward —
         // flip the sign there.
-        // fly: pinch drives forward at moveSpeed*dt; orbit: pinch zooms at pinchSpeed
-        const pinchScale = (directFirstPerson && double) ? this.moveSpeed * dt : (double * this.pinchSpeed * DISPLACEMENT_SCALE);
         pinchMoveTmp.set(0, 0, (orbit - directFirstPerson) * pinch[0]);
-        v.add(pinchMoveTmp.mulScalar(pinchScale));
+        v.add(pinchMoveTmp.mulScalar(double * this.pinchSpeed * DISPLACEMENT_SCALE));
         // tap-to-jump in walk + gaming controls
         if (isWalk && this._tapJump) {
             v.y = 1;
@@ -91365,7 +91363,7 @@ const main = async (canvas, settingsJson, config) => {
         performanceMode: storedPerformanceMode !== null ? storedPerformanceMode === 'true' : platform.mobile,
         progress: 0,
         inputMode: platform.mobile ? 'touch' : 'desktop',
-        cameraMode: 'fly',
+        cameraMode: 'orbit',
         hasAnimation: false,
         animationDuration: 0,
         animationTime: 0,
@@ -91378,7 +91376,7 @@ const main = async (canvas, settingsJson, config) => {
         collisionOverlayEnabled: false,
         isFullscreen: false,
         controlsHidden: false,
-        gamingControls: false
+        gamingControls: true
     });
     const global = {
         app,
@@ -91472,11 +91470,10 @@ export { main };
                 const settingsJson = await settings;
                 const viewer = await main(canvas, settingsJson, config);
 
-                // Fast two-finger forward movement for fly mode (no joystick)
+                // Boost pinch/touch speed for the long cloister corridor
                 if (viewer.inputController && viewer.inputController._touch) {
-                    viewer.inputController._touch.moveSpeed = 40.0;   // two-finger swipe fwd
-                    viewer.inputController._touch.orbitSpeed = 40;    // single-finger look
-                    viewer.inputController._touch.touchRotateSensitivity = 2.0;
+                    viewer.inputController._touch.pinchSpeed = 4.0;
+                    viewer.inputController._touch.moveSpeed = 8.0;
                 }
 
                 // Mark cloister as visited
