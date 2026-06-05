@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>cloister</title>
+        <title>the cloister</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
         <base href="">
@@ -91469,6 +91469,9 @@ export { main };
                 const canvas = document.getElementById('application-canvas');
                 const settingsJson = await settings;
                 const viewer = await main(canvas, settingsJson, config);
+
+                // Mark cloister as visited
+                sessionStorage.setItem('visited_cloister', 'true');
 
                 // Arrow to garden.html — fades in when z > 50
                 const arrow = document.createElement('a');
