@@ -91471,6 +91471,47 @@ export { main };
                 const settingsJson = await settings;
                 const viewer = await main(canvas, settingsJson, config);
 
+
+                // Gold key dot
+                const keyStyle = document.createElement('style');
+                keyStyle.textContent = '@keyframes pulse-gold { 0%,100%{box-shadow:0 0 6px rgba(255,200,0,0.5);transform:translate(-50%,-50%) scale(1)} 50%{box-shadow:0 0 14px rgba(255,200,0,0.9);transform:translate(-50%,-50%) scale(1.3)} }';
+                document.head.appendChild(keyStyle);
+
+                const keyDot = document.createElement('div');
+                keyDot.style.cssText = 'position:fixed;width:8px;height:8px;border-radius:50%;background:rgba(255,200,0,0.9);border:1px solid rgba(255,200,0,0.4);transform:translate(-50%,-50%);pointer-events:auto;animation:pulse-gold 2s ease-in-out infinite;display:none;z-index:1000;cursor:pointer;';
+                document.body.appendChild(keyDot);
+
+                const keyVec = new Vec3(-0.568, -1.542, 28.972);
+                const keyScreen = new Vec3();
+                const keyCam = viewer.global.camera;
+
+                keyDot.addEventListener('click', () => {
+                    if (sessionStorage.getItem('rusty_key')) return;
+                    sessionStorage.setItem('rusty_key', 'true');
+                    const frag = document.createElement('div');
+                    frag.textContent = 'a key, cold iron';
+                    frag.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font:italic 18px monospace;letter-spacing:0.05em;pointer-events:none;z-index:9999;opacity:1;transition:opacity 2s ease;';
+                    document.body.appendChild(frag);
+                    setTimeout(() => frag.style.opacity = '0', 1500);
+                    setTimeout(() => frag.remove(), 3500);
+                    keyDot.style.pointerEvents = 'none';
+                    keyDot.style.opacity = '0.3';
+                });
+
+                function tickKey() {
+                    const W = window.innerWidth, H = window.innerHeight;
+                    keyCam.camera.worldToScreen(keyVec, keyScreen);
+                    if (keyScreen.z > 0 && keyScreen.x > 0 && keyScreen.x < W && keyScreen.y > 0 && keyScreen.y < H) {
+                        keyDot.style.left = keyScreen.x + 'px';
+                        keyDot.style.top = keyScreen.y + 'px';
+                        keyDot.style.display = 'block';
+                    } else {
+                        keyDot.style.display = 'none';
+                    }
+                    requestAnimationFrame(tickKey);
+                }
+                tickKey();
+
                 // Boost pinch/touch speed for the long cloister corridor
                 if (viewer.inputController && viewer.inputController._touch) {
                     viewer.inputController._touch.pinchSpeed = 4.0;
